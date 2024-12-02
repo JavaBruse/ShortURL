@@ -1,7 +1,11 @@
 package org.MIFI;
 
+import org.MIFI.GRUD.ConnectDataBaseUtils;
+
 public class Main {
     public static void main(String[] args) {
-        System.out.println("привет Мир");
+        ConnectDataBaseUtils.getInstance().connect();
+
+        System.out.println("Отработано!");
     }
 }
