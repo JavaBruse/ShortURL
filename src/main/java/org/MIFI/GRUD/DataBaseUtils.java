@@ -10,18 +10,18 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 @Data
-public class ConnectDataBaseUtils {
+public class DataBaseUtils {
     private Connection connection;
     private Statement stmt;
-    private static volatile ConnectDataBaseUtils instance;
+    private static volatile DataBaseUtils instance;
 
-    public static ConnectDataBaseUtils getInstance() {
-        ConnectDataBaseUtils localInstance = instance;
+    public static DataBaseUtils getInstance() {
+        DataBaseUtils localInstance = instance;
         if (localInstance == null) {
-            synchronized (ConnectDataBaseUtils.class) {
+            synchronized (DataBaseUtils.class) {
                 localInstance = instance;
                 if (localInstance == null) {
-                    instance = localInstance = new ConnectDataBaseUtils();
+                    instance = localInstance = new DataBaseUtils();
                 }
             }
         }
