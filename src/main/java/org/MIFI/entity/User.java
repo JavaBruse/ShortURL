@@ -7,7 +7,7 @@ import java.util.Objects;
 
 @Data
 @NoArgsConstructor
-public class user {
+public class User implements  Entity {
     Long id;
     String name;
     String UUID;
@@ -17,7 +17,7 @@ public class user {
     public boolean equals(Object object) {
         if (this == object) return true;
         if (object == null || getClass() != object.getClass()) return false;
-        user user = (user) object;
+        User user = (User) object;
         return Objects.equals(id, user.id) && Objects.equals(name, user.name) && Objects.equals(UUID, user.UUID);
     }
 

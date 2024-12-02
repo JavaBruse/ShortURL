@@ -8,7 +8,7 @@ import java.util.Objects;
 
 @Data
 @NoArgsConstructor
-public class propertiesLink {
+public class PropertyLink implements  Entity{
     Long id;
     Long idLink;
     Date dateStart;
@@ -31,7 +31,7 @@ public class propertiesLink {
     public boolean equals(Object object) {
         if (this == object) return true;
         if (object == null || getClass() != object.getClass()) return false;
-        propertiesLink that = (propertiesLink) object;
+        PropertyLink that = (PropertyLink) object;
         return Objects.equals(id, that.id) && Objects.equals(idLink, that.idLink) && Objects.equals(dateStart, that.dateStart) && Objects.equals(dateStop, that.dateStop) && Objects.equals(limit, that.limit);
     }
 

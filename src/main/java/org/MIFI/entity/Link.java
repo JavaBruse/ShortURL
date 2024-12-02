@@ -7,7 +7,7 @@ import java.util.Objects;
 
 @Data
 @NoArgsConstructor
-public class link {
+public class Link implements  Entity {
     Long id;
     Long idUser;
     String LongLink;
@@ -27,7 +27,7 @@ public class link {
     public boolean equals(Object object) {
         if (this == object) return true;
         if (object == null || getClass() != object.getClass()) return false;
-        link link = (link) object;
+        Link link = (Link) object;
         return Objects.equals(id, link.id) && Objects.equals(idUser, link.idUser) && Objects.equals(LongLink, link.LongLink) && Objects.equals(shortLink, link.shortLink);
     }
 
