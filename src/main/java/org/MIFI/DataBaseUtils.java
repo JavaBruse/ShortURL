@@ -1,6 +1,7 @@
-package org.MIFI.GRUD;
+package org.MIFI;
 
 import lombok.Data;
+import lombok.Getter;
 import lombok.SneakyThrows;
 
 import java.io.File;
@@ -9,7 +10,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-@Data
+@Getter
 public class DataBaseUtils {
     private Connection connection;
     private Statement stmt;
