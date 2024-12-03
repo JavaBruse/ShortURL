@@ -5,6 +5,7 @@ import lombok.Data;
 @Data
 public class Settings {
     int LinksToLifetime;
+    long DaysLiveURL = 24 * 60 * 60 * 1000;
     private static volatile Settings instance;
 
     public static Settings getInstance() {

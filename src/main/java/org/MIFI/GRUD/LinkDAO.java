@@ -12,7 +12,6 @@ import java.util.ArrayList;
 public class LinkDAO implements DAO {
 
     private Statement statement;
-
     public LinkDAO() {
         this.statement = DataBaseUtils.getInstance().getStmt();
     }
@@ -20,7 +19,6 @@ public class LinkDAO implements DAO {
     public ArrayList<Link> findByUUID(String UUID) {
         try {
             ResultSet rs = statement.executeQuery("SELECT * FROM links WHERE UUID_user LIKE '" + UUID + "';");
-
             ArrayList<Link> links = new ArrayList<>();
             while (rs.next()) {
                 Link link = new Link();
@@ -68,6 +66,16 @@ public class LinkDAO implements DAO {
             return x == 1 ? true : false;
         } catch (SQLException e) {
             return false;
+        }
+    }
+
+    public String findByShortLink(String shortLink) {
+        try {
+            ResultSet rs = statement.executeQuery("SELECT * FROM links WHERE short_url LIKE '" + shortLink + "';");
+            return rs.getString(3);
+        } catch (SQLException e) {
+            return null;
+//            throw new RuntimeException(e);
         }
     }
 }

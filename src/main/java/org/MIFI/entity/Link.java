@@ -17,15 +17,6 @@ public class Link implements  Entity {
     Long dateEnd;
     Integer transitionLimit;
 
-    public Link(String UUID, String longLink, String shortLink, Long dateEnd, Integer transitionLimit) {
-        this.UUID = UUID;
-        this.LongLink = longLink;
-        this.shortLink = shortLink;
-        this.dateStart = new Date().getTime();
-        this.dateEnd = dateEnd;
-        this.transitionLimit = transitionLimit;
-    }
-
     @Override
     public String toString() {
         return "Link{" +
