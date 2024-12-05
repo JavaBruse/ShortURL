@@ -77,10 +77,14 @@ public class CoreApp {
                     System.out.println("Поздравляю с регистрацией " + line[1] + ", сохраниете UUID для входа.\nUUID: " + UUID);
                     return;
                 case "-u":
-                    if (userService.checkUserUUID(nameOrUUID)) {
-                        this.UUID = nameOrUUID;
-                        System.out.println("С возвращением " + userService.getByUUID(this.UUID).getName() + "!");
+                    String name = userService.getByUUID(line[1]);
+                    if (name != null) {
+                        this.UUID = line[1];
+                        //3d9eec90-1169-4e8b-b8d1-3f6c3f5e7c16
+                        System.out.println("С возвращением " + name + "!");
                         return;
+                    } else {
+                        System.out.println("Неверный UUID, такого в базе нет, откуда он у тебя?");
                     }
                     break;
                 case "-help": {

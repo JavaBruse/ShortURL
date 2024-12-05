@@ -1,7 +1,6 @@
 package org.MIFI.GRUD;
 
 import org.MIFI.utils.DataBaseUtils;
-import org.MIFI.entity.Entity;
 import org.MIFI.entity.User;
 
 import java.sql.ResultSet;
@@ -37,17 +36,16 @@ public class UserDAO implements DAO {
         }
     }
 
-    public User save(Entity entity) {
-        User user = (User) entity;
+    public User save(User user) {
         int x = 0;
         try {
-            x = statement.executeUpdate("insert into users\n" +
+            statement.executeUpdate("insert into users\n" +
                     " (UUID, name)\n" +
                     "values ('"
                     + user.getUUID() + "', '"
                     + user.getName() + "');");
         } catch (SQLException e) {
-            return null;
+                return null;
         }
         return user;
     }

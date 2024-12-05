@@ -10,20 +10,26 @@ public class UserService {
 
     public User addUser(String name) {
         User user = new User();
+        user.setName(name);
         user.setUUID(UUID.randomUUID().toString());
         return userDAO.save(user);
     }
 
-    public User getByUUID(String UUID) {
-        return userDAO.findByUUID(UUID);
-    }
-
-    public boolean checkUserUUID(String UUID) {
-        if (userDAO.findByUUID(UUID) == null) {
-            return false;
-        } else {
-            return true;
+    public String getByUUID(String UUID) {
+        User user = userDAO.findByUUID(UUID);
+        if (user.getUUID() != null) {
+            return user.getName();
         }
-
+        return null;
     }
+
+//    public boolean checkUserUUID(String UUID)  {
+//        User user = userDAO.findByUUID(UUID);
+//        if (user.getUUID() != null) {
+//            return true;
+//        } else {
+//            return false;
+//        }
+//
+//    }
 }
