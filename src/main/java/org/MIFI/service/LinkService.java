@@ -15,15 +15,32 @@ public class LinkService {
         this.linkDAO = new LinkDAO();
     }
 
-    public void addNewLink(User user, String longLink, int TimeToEnd) {
+    public Link addNewLink(User user, String longLink, int DayToEnd) {
+        return newLink(user, longLink, DayToEnd);
+    }
+
+    public Link addNewLink(User user, String longLink) {
+        return newLink(user, longLink, -1);
+    }
+
+    private Link newLink(User user, String longLink, int DayToEnd) {
         Link link = new Link();
         link.setUUID(user.getUUID());
         link.setLongLink(longLink);
         link.setShortLink(generateNewShortLink(longLink));
         link.setDateStart(new Date().getTime());
-        link.setDateEnd(new Date().getTime() + ((long) TimeToEnd * 24 * 60 * 60 * 1000));
-        link.setTransitionLimit(Settings.getInstance().getLinksToLifetime());
+        if (DayToEnd <= 0 && Settings.getInstance().getDAYS() < DayToEnd) {
+            link.setDateEnd(new Date().getTime() + (Settings.getInstance().getMillisecondsDays()));
+        } else {
+            link.setDateEnd(new Date().getTime() + ((long) DayToEnd * 24 * 60 * 60 * 1000));
+        }
+        link.setTransitionLimit(Settings.getInstance().getLIMIT());
         linkDAO.save(link);
+        return link;
+    }
+
+    public String getLongLink(String shortLink){
+        return linkDAO.findByShortLink(shortLink);
     }
 
     public ArrayList<Link> findByUUID(String UUID) {

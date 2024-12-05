@@ -4,9 +4,15 @@ import lombok.Data;
 
 @Data
 public class Settings {
-    int LinksToLifetime;
-    long DaysLiveURL = 24 * 60 * 60 * 1000;
+    int LIMIT = 3;
+    int DAYS = 10;
+    long MillisecondsDays = DAYS * 24 * 60 * 60 * 1000;
     private static volatile Settings instance;
+
+    public void setDAYS(int DAYS) {
+        this.DAYS = DAYS;
+        this.MillisecondsDays = DAYS * 24 * 60 * 60 * 1000;
+    }
 
     public static Settings getInstance() {
         Settings localInstance = instance;

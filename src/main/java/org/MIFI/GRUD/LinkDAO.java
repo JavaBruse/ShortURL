@@ -39,7 +39,6 @@ public class LinkDAO implements DAO {
     }
 
 
-    @Override
     public boolean save(Entity entity) {
         Link link = (Link) entity;
         int x = 0;

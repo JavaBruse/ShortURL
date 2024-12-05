@@ -24,7 +24,7 @@ public class UserDAO implements DAO {
             user.setName(rs.getString(2));
             return user;
         } catch (SQLException e) {
-            return  null;
+            return null;
         }
     }
 
@@ -37,8 +37,7 @@ public class UserDAO implements DAO {
         }
     }
 
-    @Override
-    public boolean save(Entity entity) {
+    public User save(Entity entity) {
         User user = (User) entity;
         int x = 0;
         try {
@@ -48,8 +47,8 @@ public class UserDAO implements DAO {
                     + user.getUUID() + "', '"
                     + user.getName() + "');");
         } catch (SQLException e) {
-            return false;
+            return null;
         }
-        return x == 1 ? true : false;
+        return user;
     }
 }

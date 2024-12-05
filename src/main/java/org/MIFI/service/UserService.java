@@ -8,13 +8,22 @@ import java.util.UUID;
 public class UserService {
     UserDAO userDAO = new UserDAO();
 
-    public void addUser(String name) {
+    public User addUser(String name) {
         User user = new User();
         user.setUUID(UUID.randomUUID().toString());
-        userDAO.save(user);
+        return userDAO.save(user);
     }
 
-    public User getByUUID(String UUID){
-       return userDAO.findByUUID(UUID);
+    public User getByUUID(String UUID) {
+        return userDAO.findByUUID(UUID);
+    }
+
+    public boolean checkUserUUID(String UUID) {
+        if (userDAO.findByUUID(UUID) == null) {
+            return false;
+        } else {
+            return true;
+        }
+
     }
 }
