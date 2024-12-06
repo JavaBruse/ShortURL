@@ -3,7 +3,10 @@ package org.MIFI;
 import org.MIFI.service.LinkService;
 import org.MIFI.service.UserService;
 
-import java.util.Arrays;
+import java.awt.*;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Scanner;
 
 
@@ -20,42 +23,54 @@ public class CoreApp {
     }
 
     public void start() {
-
-        System.out.println("Добро пожаловавть в Сервис коротких ссылок!\n Для просмотра команд введите help");
+        System.out.println("Добро пожаловавть в Сервис коротких ссылок!\nДля просмотра команд введите help");
         authUUID();
-
-
         while (true) {
             String input = scanner.nextLine();
-            switch ("") {
-                case "-help":
+            String[] line = input.split(" ");
+            if (linkService.isShort(line[0])) {
+                openShortURL(line[0]);
+                continue;
+            }
+            if (line.length <= 1) {
+                if (!line[0].equals("help") && !line[0].equals("exit")) line[0] = "NotFound";
+            }
+            System.out.println(line[0]);
+            switch (line[0]) {
+                case "help":
                     help();
                     break;
                 case "-l":
-
+                    addNewLink(line);
                     break;
-                case "-e":
+                case "exit":
                     return;
                 default:
-                    System.out.println("Ошибка ввода, обратитесь к справке -help");
+                    System.out.println("Ошибка ввода, обратитесь к справке help");
             }
         }
     }
 
-    private String newShort(String[] longLink) {
-        //linkService.addNewLink()
-        return "";
+    private String addNewLink(String[] line) {
+        if (line.length <= 2) {
+            return linkService.addNewLink(this.UUID, line[1]).getShortLink();
+        } else {
+            return linkService.addNewLink(this.UUID, line[1], line[3]).getShortLink();
+        }
     }
 
     private void help() {
         System.out.println("Справка");
         if (UUID != null) {
             System.out.println(
-                    "-l [URL] - создание короткой ссылки \n" +
-                            "-e      - выход");
+                    "-l [URL] - создание короткой ссылки, без параметров.\n" +
+                            "-l [URL] -h [часы:минуты] - параметр существования ссылки, например: -h 5:10 где 5 часов, 10 минут.\n" +
+                            "exit     - выход" +
+                            "");
         } else {
             System.out.println(
-                    "-n [имя пользователя] -  создание нового пользователя\n" +
+                    "[shortUrl]            -  откроет коротку ссылку, если она валидна\n" +
+                            "-n [имя пользователя] -  создание нового пользователя\n" +
                             "-u [UUID]             -  вход по UUID");
         }
 
@@ -66,9 +81,12 @@ public class CoreApp {
         while (true) {
             String nameOrUUID = scanner.nextLine();
             String[] line = nameOrUUID.split(" ");
-
-            if (line.length <= 1 && !line[0].equals("-help")) {
-                System.out.println("Ошибка ввода, обратитесь к справке -help");
+            if (linkService.isShort(line[0])) {
+                openShortURL(line[0]);
+                continue;
+            }
+            if (line.length <= 1 && !line[0].equals("help")) {
+                System.out.println("Ошибка ввода, обратитесь к справке help");
                 continue;
             }
             switch (line[0]) {
@@ -80,20 +98,37 @@ public class CoreApp {
                     String name = userService.getByUUID(line[1]);
                     if (name != null) {
                         this.UUID = line[1];
-                        //3d9eec90-1169-4e8b-b8d1-3f6c3f5e7c16
                         System.out.println("С возвращением " + name + "!");
                         return;
                     } else {
                         System.out.println("Неверный UUID, такого в базе нет, откуда он у тебя?");
                     }
                     break;
-                case "-help": {
+                case "help": {
                     help();
                     break;
                 }
                 default:
-                    System.out.println("Ошибка ввода, обратитесь к справке -help");
+                    System.out.println("Ошибка ввода, обратитесь к справке help");
             }
         }
+    }
+
+    private boolean openShortURL(String shortURL) {
+        System.out.println(linkService.getLongLink(shortURL) != null);
+        String source = linkService.getLongLink(shortURL);
+        if (source != null) {
+            try {
+                Desktop.getDesktop().browse(new URI(source));
+                System.out.println("Вот Ваша ссылка: " + source);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            } catch (URISyntaxException e) {
+                throw new RuntimeException(e);
+            }
+            return true;
+        }
+        System.out.println(shortURL + " такой ссылки нет");
+        return false;
     }
 }

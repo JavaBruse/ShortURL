@@ -27,7 +27,7 @@ public class test {
 //        for (Link link : linkDAO.findByUUID("90315dc9-6960-4ec8-b9d1-4d934502c197")) {
 //            System.out.println(link);
 //        }
-        service.getLongString("linkLong41");
+
 
     }
 }
