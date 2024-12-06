@@ -8,6 +8,7 @@ import org.MIFI.entity.User;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Random;
 
 public class LinkService {
     LinkDAO linkDAO;
@@ -33,7 +34,7 @@ public class LinkService {
     }
 
     public Link addNewLink(String UUID, String longLink) {
-        return newLink(UUID, longLink, -1);
+        return newLink(UUID, longLink, 0);
     }
 
     private Link newLink(String UUID, String longLink, long DayToEnd) {
@@ -83,7 +84,20 @@ public class LinkService {
     }
 
     private String generateNewShortLink(String longLink) {
-        return "http://clck.ru/" + longLink.substring(1, 5);
+        String dict = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890"; //строка содержит все доступные символы
+        StringBuilder sb = new StringBuilder("http://clck.ru/");
+        int max = dict.length() - 1;
+        int min = 0;
+        for (int i = 0; i < 4; i++) {
+            int number = randomMinMax(min, max);
+            sb.append(dict.substring(number, number + 1));
+        }
+        return sb.toString();
+    }
+
+    public static int randomMinMax(int min, int max) {
+        max -= min;
+        return (int) (Math.random() * ++max) + min;
     }
 
     public String getLongString(String shortLink) {

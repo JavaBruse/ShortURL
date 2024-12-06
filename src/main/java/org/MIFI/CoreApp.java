@@ -41,7 +41,7 @@ public class CoreApp {
                     help();
                     break;
                 case "-l":
-                    addNewLink(line);
+                    System.out.println("Ваша коротка ссылка готова: " + addNewLink(line));
                     break;
                 case "exit":
                     return;
@@ -52,7 +52,7 @@ public class CoreApp {
     }
 
     private String addNewLink(String[] line) {
-        if (line.length <= 2) {
+        if (line.length == 2) {
             return linkService.addNewLink(this.UUID, line[1]).getShortLink();
         } else {
             return linkService.addNewLink(this.UUID, line[1], line[3]).getShortLink();
