@@ -1,5 +1,6 @@
 package org.MIFI;
 
+import org.MIFI.entity.Link;
 import org.MIFI.service.LinkService;
 import org.MIFI.service.UserService;
 
@@ -33,7 +34,7 @@ public class CoreApp {
                 continue;
             }
             if (line.length <= 1) {
-                if (!line[0].equals("help") && !line[0].equals("exit")) line[0] = "NotFound";
+                if (!line[0].equals("help") && !line[0].equals("exit") && !line[0].equals("all")) line[0] = "NotFound";
             }
             System.out.println(line[0]);
             switch (line[0]) {
@@ -43,6 +44,8 @@ public class CoreApp {
                 case "-l":
                     System.out.println("Ваша коротка ссылка готова: " + addNewLink(line));
                     break;
+                case "all":
+                    getAllLink();
                 case "exit":
                     return;
                 default:
@@ -59,19 +62,26 @@ public class CoreApp {
         }
     }
 
+    private void getAllLink() {
+        for (Link l : linkService.getAllLink(this.UUID)) {
+            System.out.println(l);
+        }
+    }
+
     private void help() {
         System.out.println("Справка");
         if (UUID != null) {
             System.out.println(
-                    "-l [URL] - создание короткой ссылки, без параметров.\n" +
+                    "-l [URL]                  - создание короткой ссылки, без параметров.\n" +
                             "-l [URL] -h [часы:минуты] - параметр существования ссылки, например: -h 5:10 где 5 часов, 10 минут.\n" +
-                            "exit     - выход" +
-                            "");
+                            "exit                      - выход\n" +
+                            "all                       - все мои ссылки.");
         } else {
             System.out.println(
                     "[shortUrl]            -  откроет коротку ссылку, если она валидна\n" +
                             "-n [имя пользователя] -  создание нового пользователя\n" +
-                            "-u [UUID]             -  вход по UUID");
+                            "-u [UUID]             -  вход по UUID\n" +
+                            "exit                  - выход");
         }
 
     }
@@ -104,10 +114,11 @@ public class CoreApp {
                         System.out.println("Неверный UUID, такого в базе нет, откуда он у тебя?");
                     }
                     break;
-                case "help": {
+                case "help":
                     help();
                     break;
-                }
+                case "exit":
+                    System.exit(0);
                 default:
                     System.out.println("Ошибка ввода, обратитесь к справке help");
             }

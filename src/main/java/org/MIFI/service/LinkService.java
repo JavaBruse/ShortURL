@@ -5,10 +5,7 @@ import org.MIFI.entity.Link;
 import org.MIFI.entity.Settings;
 import org.MIFI.entity.User;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Random;
+import java.util.*;
 
 public class LinkService {
     LinkDAO linkDAO;
@@ -43,7 +40,7 @@ public class LinkService {
         link.setLongLink(longLink);
         link.setShortLink(generateNewShortLink(longLink));
         link.setDateStart(new Date().getTime());
-        if (DayToEnd <= 0 && Settings.getInstance().getDAYS() < DayToEnd) {
+        if ((DayToEnd >= 0 && Settings.getInstance().getDAYS() < DayToEnd) || DayToEnd == 0) {
             link.setDateEnd(new Date().getTime() + (Settings.getInstance().getMillisecondsDays()));
         } else {
             link.setDateEnd(new Date().getTime() + DayToEnd);
@@ -51,6 +48,9 @@ public class LinkService {
         link.setTransitionLimit(Settings.getInstance().getLIMIT());
         linkDAO.save(link);
         return link;
+    }
+    public ArrayList<Link> getAllLink(String UUID){
+        return linkDAO.findByUUID(UUID);
     }
 
     public String getLongLink(String shortLink) {
@@ -88,11 +88,15 @@ public class LinkService {
         StringBuilder sb = new StringBuilder("http://clck.ru/");
         int max = dict.length() - 1;
         int min = 0;
-        for (int i = 0; i < 4; i++) {
-            int number = randomMinMax(min, max);
-            sb.append(dict.substring(number, number + 1));
+        while (true) {
+            for (int i = 0; i < 6; i++) {
+                int number = randomMinMax(min, max);
+                sb.append(dict.substring(number, number + 1));
+            }
+            if (linkDAO.findByShortLink(sb.toString()) == null) {
+                return sb.toString();
+            }
         }
-        return sb.toString();
     }
 
     public static int randomMinMax(int min, int max) {
