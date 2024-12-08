@@ -1,7 +1,6 @@
 package org.MIFI.GRUD;
 
 import org.MIFI.utils.DataBaseUtils;
-import org.MIFI.entity.Entity;
 import org.MIFI.entity.Link;
 
 import java.sql.ResultSet;
@@ -28,8 +27,8 @@ public class LinkDAO implements DAO {
                 link.setUUID(rs.getString(2));
                 link.setLongLink(rs.getString(3));
                 link.setShortLink(rs.getString(4));
-                link.setDateStart((long) rs.getInt(5));
-                link.setDateEnd((long) rs.getInt(6));
+                link.setDateStart(rs.getLong(5));
+                link.setDateEnd(rs.getLong(6));
                 link.setTransitionLimit(rs.getInt(7));
                 links.add(link);
             }

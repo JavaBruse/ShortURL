@@ -43,7 +43,7 @@ public class LinkService {
         link.setLongLink(longLink);
         link.setShortLink(generateNewShortLink(longLink));
         link.setDateStart(new Date().getTime());
-        if ((DayToEnd >= 0 && Settings.getInstance().getDAYS() < DayToEnd) || DayToEnd == 0) {
+        if ((DayToEnd > 0 && Settings.getInstance().getDAYS() > DayToEnd) || DayToEnd == 0) {
             link.setDateEnd(new Date().getTime() + (Settings.getInstance().getMillisecondsDays()));
         } else {
             link.setDateEnd(new Date().getTime() + DayToEnd);
@@ -112,7 +112,8 @@ public class LinkService {
                 int number = randomMinMax(min, max);
                 sb.append(dict.substring(number, number + 1));
             }
-            if (linkDAO.findLongByShortLink(sb.toString()) == null) {
+            Optional<Link> optionalLink= linkDAO.findLongByShortLink(sb.toString());
+            if (!optionalLink.isPresent()) {
                 return sb.toString();
             }
         }

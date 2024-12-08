@@ -60,7 +60,7 @@ public class CoreApp {
         if (line.length == 2) {
             return linkService.addNewLink(this.UUID, line[1]).getShortLink();
         } else {
-            return linkService.addNewLink(this.UUID, line[1], line[3]).getShortLink();
+            return linkService.addNewLink(this.UUID, line[1], line[2]).getShortLink();
         }
     }
 
