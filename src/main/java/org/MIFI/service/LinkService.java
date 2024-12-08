@@ -3,12 +3,15 @@ package org.MIFI.service;
 import org.MIFI.GRUD.LinkDAO;
 import org.MIFI.entity.Link;
 import org.MIFI.entity.Settings;
-import org.MIFI.exeptions.NotFoundEntityException;
+import org.MIFI.exceptions.NotFoundEntityException;
 
 import java.util.*;
 
 public class LinkService {
     LinkDAO linkDAO;
+
+    String source = "clck.ru/";
+    String sourceAndHTTP = "http://clck.ru/";
 
     public LinkService() {
         this.linkDAO = new LinkDAO();
@@ -59,9 +62,7 @@ public class LinkService {
         }
     }
 
-    public String getLongLink(String shortLink) {
-        String source = "clck.ru/";
-        String sourceAndHTTP = "http://clck.ru/";
+    public Link getLongLink(String shortLink) {
         try {
             if (shortLink.substring(0, 15).equals(sourceAndHTTP)) {
                 return findLongLink(shortLink);
@@ -77,8 +78,6 @@ public class LinkService {
     }
 
     public boolean isShort(String shortLink) {
-        String source = "clck.ru/";
-        String sourceAndHTTP = "http://clck.ru/";
         try {
             if (shortLink.substring(0, 15).equals(sourceAndHTTP) || shortLink.substring(0, 8).equals(source)) {
                 return true;
@@ -90,10 +89,14 @@ public class LinkService {
 
     }
 
-    private String findLongLink(String shortLink) throws NotFoundEntityException {
+    public boolean updateLink(Link link) {
+        return linkDAO.updateLink(link);
+    }
+
+    private Link findLongLink(String shortLink) throws NotFoundEntityException {
         Optional<Link> optionalLink = linkDAO.findLongByShortLink(shortLink);
         if (optionalLink.isPresent()) {
-            return optionalLink.get().getLongLink();
+            return optionalLink.get();
         } else {
             throw new NotFoundEntityException("Нет такой ссылки: " + shortLink);
         }

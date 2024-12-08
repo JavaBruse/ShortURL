@@ -1,7 +1,7 @@
 package org.MIFI;
 
 import org.MIFI.entity.Link;
-import org.MIFI.exeptions.NotFoundEntityException;
+import org.MIFI.exceptions.NotFoundEntityException;
 import org.MIFI.service.LinkService;
 import org.MIFI.service.UserService;
 
@@ -51,7 +51,7 @@ public class CoreApp {
                 case "exit":
                     return;
                 default:
-                    System.out.println("Ошибка ввода, обратитесь к справке help");
+                    System.err.println("Ошибка ввода, обратитесь к справке help");
             }
         }
     }
@@ -88,7 +88,7 @@ public class CoreApp {
                     "[shortUrl]            -  откроет коротку ссылку, если она валидна\n" +
                             "-n [имя пользователя] -  создание нового пользователя\n" +
                             "-u [UUID]             -  вход по UUID\n" +
-                            "exit                  - выход");
+                            "exit                  -  выход");
         }
     }
 
@@ -102,7 +102,7 @@ public class CoreApp {
                 continue;
             }
             if (line.length <= 1 && !line[0].equals("help")) {
-                System.out.println("Ошибка ввода, обратитесь к справке help");
+                System.err.println("Ошибка ввода, обратитесь к справке help");
                 continue;
             }
             switch (line[0]) {
@@ -126,18 +126,20 @@ public class CoreApp {
                 case "exit":
                     System.exit(0);
                 default:
-                    System.out.println("Ошибка ввода, обратитесь к справке help");
+                    System.err.println("Ошибка ввода, обратитесь к справке help");
             }
         }
     }
 
     private boolean openShortURL(String shortURL) {
         try {
-            String source = linkService.getLongLink(shortURL);
-            if (source != null) {
+            Link link = linkService.getLongLink(shortURL);
+            if (linkService != null) {
                 try {
-                    Desktop.getDesktop().browse(new URI(source));
-                    System.out.println("Вот Ваша ссылка: " + source);
+                    link.setTransitionLimit(link.getTransitionLimit() - 1);
+                    linkService.updateLink(link);
+                    Desktop.getDesktop().browse(new URI(link.getLongLink()));
+                    System.out.println("Вот Ваша ссылка: " + link.getLongLink());
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 } catch (URISyntaxException e) {

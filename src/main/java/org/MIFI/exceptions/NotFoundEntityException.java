@@ -1,4 +1,4 @@
-package org.MIFI.exeptions;
+package org.MIFI.exceptions;
 
 public class NotFoundEntityException extends RuntimeException  {
     public NotFoundEntityException(String message) {

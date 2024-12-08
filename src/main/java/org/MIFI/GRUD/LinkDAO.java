@@ -9,11 +9,11 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Optional;
-import java.util.OptionalInt;
 
 public class LinkDAO implements DAO {
 
     private Statement statement;
+
     public LinkDAO() {
         this.statement = DataBaseUtils.getInstance().getStmt();
     }
@@ -44,8 +44,7 @@ public class LinkDAO implements DAO {
     }
 
 
-    public boolean saveLink(Entity entity) {
-        Link link = (Link) entity;
+    public boolean saveLink(Link link) {
         int x = 0;
         try {
             x = statement.executeUpdate("insert into links\n" +
@@ -62,6 +61,23 @@ public class LinkDAO implements DAO {
             //            return false;
         }
         return x == 1 ? true : false;
+    }
+
+    public boolean updateLink(Link link) {
+        int x = 0;
+        try {
+            x = statement.executeUpdate("update links set " +
+                    "UUID_user= '" + link.getUUID() + "', " +
+                    "long_url= '" + link.getLongLink() + "', " +
+                    "short_url= '" + link.getShortLink() + "', " +
+                    "date_start= '" + link.getDateStart() + "', " +
+                    "date_end= '" + link.getDateEnd() + "', " +
+                    "transition_limit= '" + link.getTransitionLimit() + "' " +
+                    "WHERE short_url= '" + link.getShortLink() + "';");
+            return x == 1 ? true : false;
+        } catch (SQLException e) {
+            return false;
+        }
     }
 
     public boolean deleteById(Long id) {
@@ -82,8 +98,8 @@ public class LinkDAO implements DAO {
                 link.setUUID(rs.getString(2));
                 link.setLongLink(rs.getString(3));
                 link.setShortLink(rs.getString(4));
-                link.setDateStart((long) rs.getInt(5));
-                link.setDateEnd((long) rs.getInt(6));
+                link.setDateStart(rs.getLong(5));
+                link.setDateEnd(rs.getLong(6));
                 link.setTransitionLimit(rs.getInt(7));
                 return Optional.of(link);
             }
