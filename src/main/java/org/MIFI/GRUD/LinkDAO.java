@@ -8,6 +8,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Optional;
+import java.util.OptionalInt;
 
 public class LinkDAO implements DAO {
 
@@ -16,7 +18,7 @@ public class LinkDAO implements DAO {
         this.statement = DataBaseUtils.getInstance().getStmt();
     }
 
-    public ArrayList<Link> findByUUID(String UUID) {
+    public Optional<ArrayList<Link>> findByUUID(String UUID) {
         try {
             ResultSet rs = statement.executeQuery("SELECT * FROM links WHERE UUID_user LIKE '" + UUID + "';");
             ArrayList<Link> links = new ArrayList<>();
@@ -31,15 +33,18 @@ public class LinkDAO implements DAO {
                 link.setTransitionLimit(rs.getInt(7));
                 links.add(link);
             }
-            return links;
+            if (links.isEmpty()) {
+                return Optional.empty();
+            } else {
+                return Optional.of(links);
+            }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
-//            return null;
+            return Optional.empty();
         }
     }
 
 
-    public boolean save(Entity entity) {
+    public boolean saveLink(Entity entity) {
         Link link = (Link) entity;
         int x = 0;
         try {
@@ -68,13 +73,23 @@ public class LinkDAO implements DAO {
         }
     }
 
-    public String findByShortLink(String shortLink) {
+    public Optional<Link> findLongByShortLink(String shortLink) {
         try {
             ResultSet rs = statement.executeQuery("SELECT * FROM links WHERE short_url LIKE '" + shortLink + "';");
-            return rs.getString(3);
+            if (rs.next()) { // Проверяем, есть ли записи в ResultSet
+                Link link = new Link();
+                link.setId((long) rs.getInt(1));
+                link.setUUID(rs.getString(2));
+                link.setLongLink(rs.getString(3));
+                link.setShortLink(rs.getString(4));
+                link.setDateStart((long) rs.getInt(5));
+                link.setDateEnd((long) rs.getInt(6));
+                link.setTransitionLimit(rs.getInt(7));
+                return Optional.of(link);
+            }
+            return Optional.empty();
         } catch (SQLException e) {
-            return null;
-//            throw new RuntimeException(e);
+            return Optional.empty();
         }
     }
 }

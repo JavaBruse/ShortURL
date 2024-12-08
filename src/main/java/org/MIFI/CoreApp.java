@@ -1,6 +1,7 @@
 package org.MIFI;
 
 import org.MIFI.entity.Link;
+import org.MIFI.exeptions.NotFoundEntityException;
 import org.MIFI.service.LinkService;
 import org.MIFI.service.UserService;
 
@@ -8,6 +9,7 @@ import java.awt.*;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 
@@ -36,7 +38,6 @@ public class CoreApp {
             if (line.length <= 1) {
                 if (!line[0].equals("help") && !line[0].equals("exit") && !line[0].equals("all")) line[0] = "NotFound";
             }
-            System.out.println(line[0]);
             switch (line[0]) {
                 case "help":
                     help();
@@ -46,6 +47,7 @@ public class CoreApp {
                     break;
                 case "all":
                     getAllLink();
+                    break;
                 case "exit":
                     return;
                 default:
@@ -63,8 +65,13 @@ public class CoreApp {
     }
 
     private void getAllLink() {
-        for (Link l : linkService.getAllLink(this.UUID)) {
-            System.out.println(l);
+        try {
+            ArrayList<Link> links = linkService.findByUUID(this.UUID);
+            for (Link l : links) {
+                System.out.println(l);
+            }
+        } catch (NotFoundEntityException e) {
+            System.err.println(e.getMessage());
         }
     }
 
@@ -83,7 +90,6 @@ public class CoreApp {
                             "-u [UUID]             -  вход по UUID\n" +
                             "exit                  - выход");
         }
-
     }
 
     private void authUUID() {
@@ -126,20 +132,23 @@ public class CoreApp {
     }
 
     private boolean openShortURL(String shortURL) {
-        System.out.println(linkService.getLongLink(shortURL) != null);
-        String source = linkService.getLongLink(shortURL);
-        if (source != null) {
-            try {
-                Desktop.getDesktop().browse(new URI(source));
-                System.out.println("Вот Ваша ссылка: " + source);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            } catch (URISyntaxException e) {
-                throw new RuntimeException(e);
+        try {
+            String source = linkService.getLongLink(shortURL);
+            if (source != null) {
+                try {
+                    Desktop.getDesktop().browse(new URI(source));
+                    System.out.println("Вот Ваша ссылка: " + source);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                } catch (URISyntaxException e) {
+                    throw new RuntimeException(e);
+                }
+                return true;
             }
-            return true;
+
+        } catch (NotFoundEntityException e) {
+            System.err.println(e.getMessage());
         }
-        System.out.println(shortURL + " такой ссылки нет");
         return false;
     }
 }

@@ -3,7 +3,7 @@ package org.MIFI.service;
 import org.MIFI.GRUD.LinkDAO;
 import org.MIFI.entity.Link;
 import org.MIFI.entity.Settings;
-import org.MIFI.entity.User;
+import org.MIFI.exeptions.NotFoundEntityException;
 
 import java.util.*;
 
@@ -46,22 +46,33 @@ public class LinkService {
             link.setDateEnd(new Date().getTime() + DayToEnd);
         }
         link.setTransitionLimit(Settings.getInstance().getLIMIT());
-        linkDAO.save(link);
+        linkDAO.saveLink(link);
         return link;
     }
-    public ArrayList<Link> getAllLink(String UUID){
-        return linkDAO.findByUUID(UUID);
+
+    public ArrayList<Link> findByUUID(String UUID) throws NotFoundEntityException {
+        Optional<ArrayList<Link>> optionalLinks = linkDAO.findByUUID(UUID);
+        if (optionalLinks.isPresent()) {
+            return optionalLinks.get();
+        } else {
+            throw new NotFoundEntityException("Ссылки по Вашему UUID: " + UUID + ", не найдено");
+        }
     }
 
     public String getLongLink(String shortLink) {
         String source = "clck.ru/";
         String sourceAndHTTP = "http://clck.ru/";
-        if (shortLink.substring(0, 15).equals(sourceAndHTTP)) {
-            return linkDAO.findByShortLink(shortLink);
-        } else if (shortLink.substring(0, 8).equals(source)) {
-            return linkDAO.findByShortLink("http://" + shortLink);
+        try {
+            if (shortLink.substring(0, 15).equals(sourceAndHTTP)) {
+                return findLongLink(shortLink);
+                //return linkDAO.findLongByShortLink(shortLink);
+            } else if (shortLink.substring(0, 8).equals(source)) {
+                return findLongLink("http://" + shortLink);
+                //return linkDAO.findLongByShortLink("http://" + shortLink);
+            }
+        } catch (NotFoundEntityException e) {
+            System.err.println(e);
         }
-        System.out.println("Проерка не было");
         return null;
     }
 
@@ -79,8 +90,13 @@ public class LinkService {
 
     }
 
-    public ArrayList<Link> findByUUID(String UUID) {
-        return linkDAO.findByUUID(UUID);
+    private String findLongLink(String shortLink) throws NotFoundEntityException {
+        Optional<Link> optionalLink = linkDAO.findLongByShortLink(shortLink);
+        if (optionalLink.isPresent()) {
+            return optionalLink.get().getLongLink();
+        } else {
+            throw new NotFoundEntityException("Нет такой ссылки: " + shortLink);
+        }
     }
 
     private String generateNewShortLink(String longLink) {
@@ -93,19 +109,15 @@ public class LinkService {
                 int number = randomMinMax(min, max);
                 sb.append(dict.substring(number, number + 1));
             }
-            if (linkDAO.findByShortLink(sb.toString()) == null) {
+            if (linkDAO.findLongByShortLink(sb.toString()) == null) {
                 return sb.toString();
             }
         }
     }
 
-    public static int randomMinMax(int min, int max) {
+    private static int randomMinMax(int min, int max) {
         max -= min;
         return (int) (Math.random() * ++max) + min;
-    }
-
-    public String getLongString(String shortLink) {
-        return linkDAO.findByShortLink(shortLink);
     }
 
 }
