@@ -7,7 +7,7 @@ public class Main {
     public static void main(String[] args) {
         DataBaseUtils.getInstance().connect();
         ConfigUtils.getInstance();
-        CoreApp coreApp = new CoreApp();
-        coreApp.start();
+        ConsoleInterface consoleInterface = new ConsoleInterface();
+        consoleInterface.start();
     }
 }

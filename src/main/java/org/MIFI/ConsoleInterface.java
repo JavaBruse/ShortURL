@@ -2,6 +2,8 @@ package org.MIFI;
 
 import org.MIFI.entity.Link;
 import org.MIFI.exceptions.NotFoundEntityException;
+import org.MIFI.exceptions.TimeErrorException;
+import org.MIFI.exceptions.URLNotCorrect;
 import org.MIFI.service.LinkService;
 import org.MIFI.service.UserService;
 
@@ -13,13 +15,13 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 
-public class CoreApp {
+public class ConsoleInterface {
     private LinkService linkService;
     private UserService userService;
     private String UUID = null;
     private Scanner scanner;
 
-    public CoreApp() {
+    public ConsoleInterface() {
         this.linkService = new LinkService();
         this.userService = new UserService();
         this.scanner = new Scanner(System.in);
@@ -43,7 +45,7 @@ public class CoreApp {
                     help();
                     break;
                 case "-l":
-                    System.out.println("Ваша коротка ссылка готова: " + addNewLink(line));
+                    addNewLink(line);
                     break;
                 case "all":
                     getAllLink();
@@ -56,12 +58,24 @@ public class CoreApp {
         }
     }
 
-    private String addNewLink(String[] line) {
-        if (line.length == 2) {
-            return linkService.addNewLink(this.UUID, line[1]).getShortLink();
-        } else {
-            return linkService.addNewLink(this.UUID, line[1], line[2]).getShortLink();
+    private void addNewLink(String[] line) {
+        String link;
+        try {
+            if (line.length == 2) {
+                link = linkService.addNewLink(this.UUID, line[1]).getShortLink();
+            } else {
+                try {
+                    link = linkService.addNewLink(this.UUID, line[1], line[2]).getShortLink();
+                } catch (TimeErrorException e) {
+                    System.err.println(e.getMessage());
+                    return;
+                }
+            }
+        } catch (URLNotCorrect e) {
+            System.err.println(e.getMessage());
+            return;
         }
+        System.out.println("Ваша коротка ссылка готова: " + link);
     }
 
     private void getAllLink() {

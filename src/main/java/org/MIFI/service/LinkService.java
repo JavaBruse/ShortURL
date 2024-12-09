@@ -4,8 +4,14 @@ import org.MIFI.GRUD.LinkDAO;
 import org.MIFI.entity.Link;
 import org.MIFI.entity.Settings;
 import org.MIFI.exceptions.NotFoundEntityException;
+import org.MIFI.exceptions.TimeErrorException;
+import org.MIFI.exceptions.URLNotAvailable;
+import org.MIFI.exceptions.URLNotCorrect;
 
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.*;
+import java.util.regex.Pattern;
 
 public class LinkService {
     LinkDAO linkDAO;
@@ -17,27 +23,39 @@ public class LinkService {
         this.linkDAO = new LinkDAO();
     }
 
-    public Link addNewLink(String UUID, String longLink, String time) {
-        return newLink(UUID, longLink, getTime(time));
+    public Link addNewLink(String UUID, String longLink, String time) throws TimeErrorException, URLNotCorrect {
+        try {
+            Link link = newLink(UUID, longLink, getTime(time));
+            return link;
+        } catch (TimeErrorException | URLNotCorrect e) {
+            throw e;
+        }
+
     }
 
-    private long getTime(String time) {
-        String[] i = time.split(":");
+    private long getTime(String time) throws TimeErrorException {
         int countTime = 0;
+        String[] i = time.split(":");
         try {
             countTime += Integer.parseInt(i[0]) * 1000 * 60 * 60;
             countTime += Integer.parseInt(i[1]) * 1000 * 60;
-        } catch (NumberFormatException e) {
-
+        } catch (RuntimeException e) {
+            throw new TimeErrorException("Некорректно задано время, ошибка: " + time);
         }
         return countTime;
     }
 
-    public Link addNewLink(String UUID, String longLink) {
-        return newLink(UUID, longLink, 0);
+    public Link addNewLink(String UUID, String longLink) throws URLNotCorrect {
+        try {
+            return newLink(UUID, longLink, 0);
+        } catch (URLNotCorrect e) {
+            throw e;
+        }
+
     }
 
-    private Link newLink(String UUID, String longLink, long DayToEnd) {
+    private Link newLink(String UUID, String longLink, long DayToEnd) throws URLNotCorrect {
+        if (!isURL(longLink)) throw new URLNotCorrect("Адресс не корректен!");
         Link link = new Link();
         link.setUUID(UUID);
         link.setLongLink(longLink);
@@ -112,7 +130,7 @@ public class LinkService {
                 int number = randomMinMax(min, max);
                 sb.append(dict.substring(number, number + 1));
             }
-            Optional<Link> optionalLink= linkDAO.findLongByShortLink(sb.toString());
+            Optional<Link> optionalLink = linkDAO.findLongByShortLink(sb.toString());
             if (!optionalLink.isPresent()) {
                 return sb.toString();
             }
@@ -124,4 +142,14 @@ public class LinkService {
         return (int) (Math.random() * ++max) + min;
     }
 
+    private boolean isURL(String URL) {
+        String urlPattern = "^(https?|ftp)://[\\w-]+(\\.[\\w-]+)+(:\\d+)?(/[\\w-./?%&=]*)?$";
+        return Pattern.matches(urlPattern, URL);
+    }
+
+    private boolean isAvailable(String url) throws Exception {
+        HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+        connection.setRequestMethod("HEAD");
+        return connection.getResponseCode() == HttpURLConnection.HTTP_OK;
+    }
 }
