@@ -98,10 +98,12 @@ public class LinkService {
                 link = findLongLink(shortLink);
             }
             if (link.getDateEnd() < new Date().getTime()) {
-                throw new TimeErrorException("Время активности ссылки истекло!");
+                linkDAO.deleteById(link.getId());
+                throw new TimeErrorException("Время активности ссылки истекло, ссылка удалена!");
             }
             if (link.getTransitionLimit() <= 0) {
-                throw new LimitIsOverException("Лимит на переходы истек");
+                linkDAO.deleteById(link.getId());
+                throw new LimitIsOverException("Лимит на переходы истек, ссылка удалена!");
             }
             return link;
         } catch (NotFoundEntityException | NullPointerException e) {
@@ -110,7 +112,6 @@ public class LinkService {
         return null;
     }
 
-    // private boolean is
 
     public boolean isShort(String shortLink) {
         try {
