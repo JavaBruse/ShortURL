@@ -129,9 +129,8 @@ public class ConsoleInterface {
                 openShortURL(line[0]);
                 continue;
             }
-            if (line.length <= 1 && !line[0].equals("help")) {
-                System.err.println("Ошибка ввода, обратитесь к справке help");
-                continue;
+            if (line.length <= 1) {
+                if (!line[0].equals("help") && !line[0].equals("exit")) line[0] = "NotFound";
             }
             switch (line[0]) {
                 case "-n":
