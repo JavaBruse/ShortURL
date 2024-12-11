@@ -76,6 +76,8 @@ public class ConfigUtils {
         if (!checkFileIni()) {
             try {
                 file.createNewFile();
+                this.ini = new Wini(file);
+                recordSettings();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
