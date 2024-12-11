@@ -55,7 +55,7 @@ public class ConsoleInterface {
                     deleteShortLink(line[1]);
                     break;
                 case "exit":
-                    return;
+                    System.exit(0);
                 default:
                     System.err.println("Ошибка ввода, обратитесь к справке help");
             }
