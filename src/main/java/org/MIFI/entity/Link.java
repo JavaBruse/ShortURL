@@ -3,7 +3,6 @@ package org.MIFI.entity;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -29,6 +28,9 @@ public class Link implements Entity {
     }
 
     private String getDateString() {
+        if (new Date().getTime() > dateEnd) {
+            return "время истекло";
+        }
         Long date = dateEnd - new Date().getTime();
 
         long days = TimeUnit.MILLISECONDS.toDays(date);
@@ -37,7 +39,6 @@ public class Link implements Entity {
         long seconds = TimeUnit.MILLISECONDS.toSeconds(date) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(date));
 
         return String.format("%d дней, %d ч %d м %d сек", days, hours, minutes, seconds);
-//        return new SimpleDateFormat("dd.MM. HH:mm:ss").format(new Date(date));
     }
 
     @Override

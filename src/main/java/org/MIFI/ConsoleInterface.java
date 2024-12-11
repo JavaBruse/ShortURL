@@ -1,6 +1,7 @@
 package org.MIFI;
 
 import org.MIFI.entity.Link;
+import org.MIFI.exceptions.LimitIsOverException;
 import org.MIFI.exceptions.NotFoundEntityException;
 import org.MIFI.exceptions.TimeErrorException;
 import org.MIFI.exceptions.URLNotCorrect;
@@ -50,12 +51,24 @@ public class ConsoleInterface {
                 case "all":
                     getAllLink();
                     break;
+                case "-rm":
+                    deleteShortLink(line[1]);
+                    break;
                 case "exit":
                     return;
                 default:
                     System.err.println("Ошибка ввода, обратитесь к справке help");
             }
         }
+    }
+
+    private void deleteShortLink(String shortLink) {
+        try {
+            linkService.deleteShortLink(shortLink, this.UUID);
+        } catch (NotFoundEntityException e) {
+            System.err.println(e.getMessage());
+        }
+
     }
 
     private void addNewLink(String[] line) {
@@ -93,10 +106,11 @@ public class ConsoleInterface {
         System.out.println("Справка");
         if (UUID != null) {
             System.out.println(
-                    "-l [URL]                  - создание короткой ссылки, без параметров.\n" +
-                            "-l [URL] -h [часы:минуты] - параметр существования ссылки, например: -h 5:10 где 5 часов, 10 минут.\n" +
-                            "exit                      - выход\n" +
-                            "all                       - все мои ссылки.");
+                    "-l [URL]                      - создание короткой ссылки, без параметров.\n" +
+                            "-l [URL] [часы:минуты]        - параметр существования ссылки, например: 5:10 где 5 часов, 10 минут.\n" +
+                            "-rm [адресс короткой ссылки]  - удаление короткой строки\n" +
+                            "all                           - все мои ссылки.\n" +
+                            "exit                          - выход\n");
         } else {
             System.out.println(
                     "[shortUrl]            -  откроет коротку ссылку, если она валидна\n" +
@@ -150,8 +164,12 @@ public class ConsoleInterface {
             Link link = linkService.getLongLink(shortURL);
             if (linkService != null) {
                 try {
-                    link.setTransitionLimit(link.getTransitionLimit() - 1);
-                    linkService.updateLink(link);
+                    if (!link.getUUID().equals(this.UUID)) {
+                        link.setTransitionLimit(link.getTransitionLimit() - 1);
+                        linkService.updateLink(link);
+                    } else {
+                        System.out.println("Лимит ссылки не изменен, т.к. Вы являетесь её владельцем.");
+                    }
                     Desktop.getDesktop().browse(new URI(link.getLongLink()));
                     System.out.println("Вот Ваша ссылка: " + link.getLongLink());
                 } catch (IOException e) {
@@ -161,8 +179,7 @@ public class ConsoleInterface {
                 }
                 return true;
             }
-
-        } catch (NotFoundEntityException e) {
+        } catch (NotFoundEntityException | TimeErrorException | LimitIsOverException e) {
             System.err.println(e.getMessage());
         }
         return false;
