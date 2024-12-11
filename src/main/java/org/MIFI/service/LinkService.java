@@ -33,7 +33,7 @@ public class LinkService {
 
     public Link addNewLink(String UUID, String longLink, String time) throws TimeErrorException, URLNotCorrect {
         try {
-            long countTime = 0;
+            long countTime = 0l;
             countTime = getTime(time);
             if ((countTime > 0 && Settings.getInstance().getMillisecondsDays() < countTime)) {
                 countTime = Settings.getInstance().getMillisecondsDays();
@@ -49,11 +49,11 @@ public class LinkService {
     }
 
     private long getTime(String time) throws TimeErrorException {
-        int countTime = 0;
+        Long countTime = 0l;
         String[] i = time.split(":");
         try {
-            countTime += Integer.parseInt(i[0]) * 1000 * 60 * 60;
-            countTime += Integer.parseInt(i[1]) * 1000 * 60;
+            countTime += Long.parseLong(i[0]) * 1000 * 60 * 60;
+            countTime += Long.parseLong(i[1]) * 1000 * 60;
         } catch (RuntimeException e) {
             throw new TimeErrorException("Некорректно задано время, ошибка: " + time);
         }
