@@ -9,7 +9,7 @@ import java.io.IOException;
 
 public class ConfigUtils {
     private Wini ini;
-    private final String INI_FILE = "config.ini";
+    private final String INI_FILE = "date/config.ini";
 
     public ConfigUtils() {
         iniWrite();
@@ -74,6 +74,7 @@ public class ConfigUtils {
     private File getFile() {
         File file = new File(INI_FILE);
         if (!checkFileIni()) {
+            file.getParentFile().mkdirs();
             try {
                 file.createNewFile();
                 this.ini = new Wini(file);

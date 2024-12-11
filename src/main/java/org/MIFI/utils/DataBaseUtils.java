@@ -30,7 +30,9 @@ public class DataBaseUtils {
 
     @SneakyThrows
     public void connect() {
-        String fileName = "service.db";
+        createFolder("date");
+
+        String fileName = "date/service.db";
         boolean check = checkFile(fileName);
         Class.forName("org.sqlite.JDBC");
         connection = DriverManager.getConnection("jdbc:sqlite:" + fileName);
@@ -67,5 +69,9 @@ public class DataBaseUtils {
     private boolean checkFile(String fileCheck) {
         File file = new File(fileCheck);
         return file.exists();
+    }
+    private void createFolder(String folderName){
+        File folder = new File(folderName);
+        if (!folder.exists()) folder.mkdir();
     }
 }
