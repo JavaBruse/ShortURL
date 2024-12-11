@@ -74,7 +74,24 @@ public class LinkService {
         } else {
             link.setDateEnd(new Date().getTime() + DayToEnd);
         }
-        link.setTransitionLimit(Settings.getInstance().getLIMIT());
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Введите лимит переходов, максимум указаный в конфиге: " + Settings.getInstance().getLIMIT());
+        int limit = 0;
+        while (true){
+
+            try {
+                limit = Integer.parseInt(scanner.nextLine());
+                break;
+            } catch (NumberFormatException e) {
+                System.err.println("Не корректное значение, введите цифру от 1, или 0 это значение по умолчанию из конфига");
+            }
+        }
+
+        if (limit == 0 || limit > Settings.getInstance().getLIMIT()) {
+            link.setTransitionLimit(Settings.getInstance().getLIMIT());
+        } else {
+            link.setTransitionLimit(limit);
+        }
         linkDAO.saveLink(link);
         return link;
     }
