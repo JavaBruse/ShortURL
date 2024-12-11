@@ -172,9 +172,8 @@ public class ConsoleInterface {
                     }
                     Desktop.getDesktop().browse(new URI(link.getLongLink()));
                     System.out.println("Вот Ваша ссылка: " + link.getLongLink());
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                } catch (URISyntaxException e) {
+                } catch (NullPointerException e) {
+                } catch (IOException | URISyntaxException e) {
                     throw new RuntimeException(e);
                 }
                 return true;
