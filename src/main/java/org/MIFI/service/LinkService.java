@@ -33,7 +33,14 @@ public class LinkService {
 
     public Link addNewLink(String UUID, String longLink, String time) throws TimeErrorException, URLNotCorrect {
         try {
-            Link link = newLink(UUID, longLink, getTime(time));
+            long countTime = 0;
+            countTime = getTime(time);
+            if ((countTime > 0 && Settings.getInstance().getMillisecondsDays() < countTime)) {
+                countTime = Settings.getInstance().getMillisecondsDays();
+            } else if (countTime == 0) {
+                countTime = Settings.getInstance().getMillisecondsDays();
+            }
+            Link link = newLink(UUID, longLink, countTime);
             return link;
         } catch (TimeErrorException | URLNotCorrect e) {
             throw e;
@@ -69,15 +76,11 @@ public class LinkService {
         link.setLongLink(longLink);
         link.setShortLink(generateNewShortLink());
         link.setDateStart(new Date().getTime());
-        if ((DayToEnd > 0 && Settings.getInstance().getDAYS() > DayToEnd) || DayToEnd == 0) {
-            link.setDateEnd(new Date().getTime() + (Settings.getInstance().getMillisecondsDays()));
-        } else {
-            link.setDateEnd(new Date().getTime() + DayToEnd);
-        }
+        link.setDateEnd(new Date().getTime() + DayToEnd);
         Scanner scanner = new Scanner(System.in);
         System.out.println("Введите лимит переходов, максимум указаный в конфиге: " + Settings.getInstance().getLIMIT());
         int limit = 0;
-        while (true){
+        while (true) {
 
             try {
                 limit = Integer.parseInt(scanner.nextLine());
