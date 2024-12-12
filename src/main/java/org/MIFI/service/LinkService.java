@@ -220,7 +220,7 @@ public class LinkService {
 
     private boolean isURL(String URL) {
 //        String urlPattern = "^(https?|ftp)://[\\w-]+(\\.[\\w-]+)+(:\\d+)?(/[\\w-./?%&=]*)?$";
-        String urlPattern = "^(https?|ftp)://((([\\w-]+\\.)+[\\w-]+)|(\\d{1,3}(\\.\\d{1,3}){3}))(:\\d+)?(/[\\w-./?%&=]*)?(#[\\w-]*)?$";
+        String urlPattern = "^(https?|ftp)://((([\\w-]+\\.)+[\\w-]+)|(\\d{1,3}(\\.\\d{1,3}){3}))(:\\d+)?(/[\\w-./:@!$&'()*+,;=~%]*)?(\\?[\\w-./:@!$&'()*+,;=~%]*)?(#[\\w-./:@!$&'()*+,;=~%]*)?$";
         return Pattern.matches(urlPattern, URL);
     }
 
