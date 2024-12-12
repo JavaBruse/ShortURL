@@ -33,7 +33,7 @@ public class LinkService {
 
     public Link addNewLink(String UUID, String longLink, String time) throws TimeErrorException, URLNotCorrect {
         try {
-            long countTime = 0l;
+            Long countTime;
             countTime = getTime(time);
             if ((countTime > 0 && Settings.getInstance().getMillisecondsDays() < countTime)) {
                 countTime = Settings.getInstance().getMillisecondsDays();
@@ -48,12 +48,51 @@ public class LinkService {
 
     }
 
+    public Link editLink(Link link) {
+        Scanner scanner = new Scanner(System.in);
+        while (true) {
+            String[] line = scanner.nextLine().split(" ");
+            try {
+                if (line.length == 6) {
+                    if (isURL(line[1])) {
+                        link.setLongLink(line[1]);
+                        try {
+                            if (Integer.parseInt(line[3]) > Settings.getInstance().getLIMIT()) {
+                                link.setTransitionLimit(Settings.getInstance().getLIMIT());
+                            } else {
+                                link.setTransitionLimit(Integer.parseInt(line[3]));
+                            }
+                        } catch (NumberFormatException e) {
+                            throw new NotFoundEntityException("Не корректен лимит переходов: " + line[3]);
+                        }
+
+                        Long time = getTime(line[5]);
+                        if (time > Settings.getInstance().getMillisecondsDays()) {
+                            link.setDateEnd(new Date().getTime() + Settings.getInstance().getMillisecondsDays());
+                        } else {
+                            link.setDateEnd(new Date().getTime() + time);
+                        }
+                        System.out.println("Link обновлен:\n" + link);
+                        return link;
+                    } else {
+                        throw new URLNotCorrect("LongLink не корректен, это не ссылка!");
+                    }
+                } else {
+                    throw new NotFoundEntityException("Не корректная строка, проверьте введенные значение, их меньше 6");
+                }
+            } catch (NumberFormatException | TimeErrorException | URLNotCorrect | NotFoundEntityException e) {
+                System.err.println(e.getMessage());
+            }
+
+        }
+    }
+
     private long getTime(String time) throws TimeErrorException {
         Long countTime = 0l;
         String[] i = time.split(":");
         try {
-            countTime += Long.parseLong(i[0]) * 1000 * 60 * 60;
-            countTime += Long.parseLong(i[1]) * 1000 * 60;
+            countTime += Long.parseLong(i[0]) * 1000l * 60l * 60l;
+            countTime += Long.parseLong(i[1]) * 1000l * 60l;
         } catch (RuntimeException e) {
             throw new TimeErrorException("Некорректно задано время, ошибка: " + time);
         }
@@ -62,14 +101,13 @@ public class LinkService {
 
     public Link addNewLink(String UUID, String longLink) throws URLNotCorrect {
         try {
-            return newLink(UUID, longLink, 0);
+            return newLink(UUID, longLink, Settings.getInstance().getMillisecondsDays());
         } catch (URLNotCorrect e) {
             throw e;
         }
-
     }
 
-    private Link newLink(String UUID, String longLink, long DayToEnd) throws URLNotCorrect {
+    private Link newLink(String UUID, String longLink, Long DayToEnd) throws URLNotCorrect {
         if (!isURL(longLink)) throw new URLNotCorrect("Адресс не корректен, вот варианты:\n" + errorLink);
         Link link = new Link();
         link.setUUID(UUID);
@@ -108,7 +146,7 @@ public class LinkService {
         }
     }
 
-    public Link getLongLink(String shortLink) {
+    public Link getLinkByShortLink(String shortLink) {
         try {
             Link link = null;
             if (shortLink.substring(0, 8).equals(source)) {

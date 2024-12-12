@@ -1,6 +1,7 @@
 package org.MIFI;
 
 import org.MIFI.entity.Link;
+import org.MIFI.entity.Settings;
 import org.MIFI.exceptions.LimitIsOverException;
 import org.MIFI.exceptions.NotFoundEntityException;
 import org.MIFI.exceptions.TimeErrorException;
@@ -54,11 +55,31 @@ public class ConsoleInterface {
                 case "-rm":
                     deleteShortLink(line[1]);
                     break;
+                case "-e":
+                    editLink(line[1]);
+                    break;
                 case "exit":
                     System.exit(0);
                 default:
                     System.err.println("Ошибка ввода, обратитесь к справке help");
             }
+        }
+    }
+
+    private void editLink(String shortLink) {
+        try {
+            if (linkService.isShort(shortLink)) {
+                Link link = linkService.getLinkByShortLink(shortLink);
+                if (!link.getUUID().equals(this.UUID)) {
+                    System.err.println("У Вас нет такой ссылки");
+                    return;
+                }
+                System.out.println("Для редактирования ссылки, скпируйте или перепишите сущестувующие параметры строки, CountLive долежн быть описан в виде 2:30, где 2ч 30 минут");
+                System.out.println("LongLink: " + link.getLongLink() + " Limit: " + link.getTransitionLimit() + " CountLive: [0:0]");
+                linkService.updateLink(linkService.editLink(link));
+            }
+        } catch (NotFoundEntityException | TimeErrorException | LimitIsOverException e) {
+            System.err.println(e.getMessage());
         }
     }
 
@@ -110,7 +131,8 @@ public class ConsoleInterface {
                             "-l [URL] [часы:минуты]        - параметр существования ссылки, например: 5:10 где 5 часов, 10 минут.\n" +
                             "-rm [адресс короткой ссылки]  - удаление короткой строки\n" +
                             "all                           - все мои ссылки.\n" +
-                            "exit                          - выход\n");
+                            "-e [адресс короткой ссылки]   - редактирование параметров ссылки.\n" +
+                            "exit                          - выход");
         } else {
             System.out.println(
                     "[shortUrl]            -  откроет коротку ссылку, если она валидна\n" +
@@ -121,7 +143,7 @@ public class ConsoleInterface {
     }
 
     private void authUUID() {
-        System.out.println("Введите имя нового пользователя, или UUID существующего:");
+        System.out.println("Введите имя нового пользователя, UUID существующего или уже известную короткую ссылку:");
         while (true) {
             String nameOrUUID = scanner.nextLine();
             String[] line = nameOrUUID.split(" ");
@@ -160,7 +182,7 @@ public class ConsoleInterface {
 
     private boolean openShortURL(String shortURL) {
         try {
-            Link link = linkService.getLongLink(shortURL);
+            Link link = linkService.getLinkByShortLink(shortURL);
             if (linkService != null) {
                 try {
                     if (!link.getUUID().equals(this.UUID)) {

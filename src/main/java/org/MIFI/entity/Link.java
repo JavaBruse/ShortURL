@@ -31,7 +31,7 @@ public class Link implements Entity {
         if (new Date().getTime() > dateEnd) {
             return "время истекло";
         }
-        Long date = dateEnd - new Date().getTime();
+        long date = dateEnd - new Date().getTime();
 
         long days = TimeUnit.MILLISECONDS.toDays(date);
         long hours = TimeUnit.MILLISECONDS.toHours(date) - TimeUnit.DAYS.toHours(days);
