@@ -1,9 +1,4 @@
 ## Актуальная версия: [ShortURL-1.0.jar](target/ShortURL-1.0.jar)
-<details><summary> История версий:</summary>
-
-- 13.12.2024г. [ShortURL-1.0.jar](target/ShortURL-1.0.jar).
-
-</details>
 Или можете собрать проект командой: 
 
 ```shell
